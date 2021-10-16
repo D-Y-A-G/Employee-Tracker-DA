@@ -13,6 +13,20 @@ const db = mysql.createConnection(
   console.log(`Connected to database.`)
 );
 
+const userChoices = {
+  addEmp: "Add employee",
+  deleteEmp: "Delete employee",
+  viewEmp: "View all employees",
+  viewRoles: "View all Roles",
+  updateRole: "Update role",
+  viewDept: "View Department",
+  addDept: "Add department",
+  exitApp: "Exit application",
+  returnMainMenu: "Return to Main Menu",
+};
+
+const menuSelectPrompt = "Please select an action from below";
+
 /////////////// to get data from mysql /////////////
 // const dept = "Shipping";
 // db.query(
@@ -41,17 +55,14 @@ const startApp = () => {
     .prompt([
       {
         type: "list",
-        message: "Please select an action from below",
+        message: menuSelectPrompt,
         name: "mainMenu",
-        choices: [
-          "Add employee",
-          "Delete employee",
-          "View all employees",
-          "Update role",
-          "View Department",
-          "Add department",
-        ],
+        choices: Object.values(userChoices).filter((choice) => {
+          return choice !== userChoices.returnMainMenu;
+        }),
+        loop: false,
       },
+
       // {
       //   type: "input",
       //   message: "Please add employee name",
@@ -63,30 +74,47 @@ const startApp = () => {
       const choice = answer.mainMenu;
 
       switch (choice) {
-        case "Add employee":
+        case userChoices.addEmp:
           break;
-        case "View all employees":
+        case userChoices.viewEmp:
           viewEmp();
           break;
-        case "Update role":
+        case userChoices.viewRoles:
+          viewRoles();
+          break;
+        case userChoices.updateRole:
           break;
 
-        case "View Department":
+        case userChoices.viewDept:
           viewDept();
           break;
-        case "Add department":
+        case userChoices.addDept:
           break;
       }
-
-      // addRole = addRole + ``;
-      console.log(answer);
     });
 };
 
 const returnMainMenu = () => {
-
-  
-}
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: menuSelectPrompt,
+        name: "returnSelection",
+        choices: [userChoices.returnMainMenu, userChoices.exitApp],
+      },
+    ])
+    .then((answer) => {
+      const choice = answer.returnSelection;
+      switch (choice) {
+        case userChoices.returnMainMenu:
+          // startApp();
+          break;
+        case userChoices.exitApp:
+          break;
+      }
+    });
+};
 
 const viewEmp = () => {
   db.query("SELECT * FROM employee", function (err, results) {
@@ -94,17 +122,30 @@ const viewEmp = () => {
 
     console.table(results);
   });
+  returnMainMenu();
+  console.clear();
 };
 
 const viewDept = () => {
   db.query("SELECT * FROM department", (err, results) => {
     console.table(results);
   });
+  returnMainMenu();
+  console.clear();
+};
+
+const viewRoles = () => {
+  db.query("SELECT * FROM roles", (err, results) => {
+    console.table(results);
+  });
+  returnMainMenu();
+  console.clear();
 };
 
 startApp();
 
-
 // const employee = {first_name: "Denis", last_name: "Arce", role_id: "1", manager_id: "1"};
 
 // db.query("INSERT INTO (first_name, last_name, role_id, manager_id) VALUES (" + employee.first_name + "," + employee.last_name + "," + employee.role_id + "," employee.manager_id + ")", function(err, results) {});
+
+
