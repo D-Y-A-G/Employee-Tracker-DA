@@ -13,15 +13,16 @@ const db = mysql.createConnection(
   console.log(`Connected to database.`)
 );
 
+//////////setup user choices in a variable to plug in into functions ////////////
+
 const userChoices = {
-  addEmp: "Add employee",
-  deleteEmp: "Delete employee",
   viewEmp: "View all employees",
+  addEmp: "Add employee",
   viewRoles: "View all Roles",
-  updateRole: "Update role",
-  viewDept: "View Department",
-  addDept: "Add department",
-  exitApp: "Exit application",
+  updateRole: "Update Role",
+  viewDept: "View All Departments",
+  addDept: "Add New Department",
+  exitApp: "Exit Application",
   returnMainMenu: "Return to Main Menu",
 };
 
@@ -39,7 +40,7 @@ const menuSelectPrompt = "Please select an action from below";
 //   console.log(results);
 //   console.table(results);
 // });
-///// adding values to employee to test with mysql
+// /// adding values to employee to test with mysql
 // const employee = {
 //   first_name: "Denis",
 //   last_name: "Arce",
@@ -70,6 +71,8 @@ const startApp = () => {
       // },
     ])
 
+    ////////////////using switch case to access each function ////////////////
+
     .then((answer) => {
       const choice = answer.mainMenu;
 
@@ -89,10 +92,13 @@ const startApp = () => {
           viewDept();
           break;
         case userChoices.addDept:
+          addDept();
           break;
       }
     });
 };
+
+/////////// Return to main menu  /////////////////////
 
 const returnMainMenu = () => {
   inquirer
@@ -108,13 +114,37 @@ const returnMainMenu = () => {
       const choice = answer.returnSelection;
       switch (choice) {
         case userChoices.returnMainMenu:
-          // startApp();
+          startApp();
           break;
         case userChoices.exitApp:
           break;
       }
     });
 };
+/////////////////// Need to work on adding employees ////////////////////////
+
+const addDept = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "What is the department name?",
+        name: "deptName",
+      },
+    ])
+    .then((answer) => {
+      db.query(
+        `INSERT INTO department (department_name) VALUES ("${answer.deptName}")`,
+        (err, results) => {
+          if (err) throw err;
+          console.log("Department added!");
+        }
+      );
+      returnMainMenu();
+    });
+};
+
+////////////////// View employees, department and roles functions //////////////////
 
 const viewEmp = () => {
   db.query("SELECT * FROM employee", function (err, results) {
@@ -123,7 +153,7 @@ const viewEmp = () => {
     console.table(results);
   });
   returnMainMenu();
-  console.clear();
+  // console.clear();
 };
 
 const viewDept = () => {
@@ -131,7 +161,7 @@ const viewDept = () => {
     console.table(results);
   });
   returnMainMenu();
-  console.clear();
+  // console.clear();
 };
 
 const viewRoles = () => {
@@ -139,7 +169,7 @@ const viewRoles = () => {
     console.table(results);
   });
   returnMainMenu();
-  console.clear();
+  // console.clear();
 };
 
 startApp();
@@ -147,5 +177,3 @@ startApp();
 // const employee = {first_name: "Denis", last_name: "Arce", role_id: "1", manager_id: "1"};
 
 // db.query("INSERT INTO (first_name, last_name, role_id, manager_id) VALUES (" + employee.first_name + "," + employee.last_name + "," + employee.role_id + "," employee.manager_id + ")", function(err, results) {});
-
-
