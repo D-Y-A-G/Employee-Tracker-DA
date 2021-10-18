@@ -16,10 +16,11 @@ const db = mysql.createConnection(
 //////////setup user choices in a variable to plug in into functions ////////////
 
 const userChoices = {
-  viewEmp: "View all employees",
-  addEmp: "Add employee",
-  viewRoles: "View all Roles",
-  updateRole: "Update Role",
+  viewEmp: "View All employees",
+  addEmp: "Add Employee",
+  updateEmp: "Update Employee Role",
+  viewRoles: "View All Roles",
+  updateRole: "Add Role",
   viewDept: "View All Departments",
   addDept: "Add New Department",
   exitApp: "Exit Application",
@@ -63,12 +64,6 @@ const startApp = () => {
         }),
         loop: false,
       },
-
-      // {
-      //   type: "input",
-      //   message: "Please add employee name",
-      //   name: "employeeDetails",
-      // },
     ])
 
     ////////////////using switch case to access each function ////////////////
@@ -121,7 +116,7 @@ const returnMainMenu = () => {
       }
     });
 };
-/////////////////// Need to work on adding employees ////////////////////////
+/////////////////// adding department ////////////////////////
 
 const addDept = () => {
   inquirer
@@ -144,7 +139,51 @@ const addDept = () => {
     });
 };
 
-////////////////// View employees, department and roles functions //////////////////
+///////////////////adding
+
+const addEmp = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Please add employee's name",
+        name: "name",
+      },
+      {
+        type: "input",
+        message: "Please add employee's last name",
+        name: "lastName",
+      },
+    ])
+    .then((answer) => {
+      db.query(``, (err, results) => {});
+      returnMainMenu();
+    });
+};
+
+//////////////////////// Add Role ////////////////////////////////
+
+const addRole = () => {
+  inquirer.prompt([
+    {
+      type: "input",
+      message: " What is the name of the new Role?",
+      name: "roleName",
+    },
+    {
+      type: "input",
+      message: " What is the salary of the new Role?",
+      name: "salary",
+    },
+    {
+      type: "list",
+      message: " Which department does the role belong to?",
+      name: "roleDept",
+      choices: ["Engineering", "Sales", "Finance", "Legal", "Executive"],
+    },
+  ]);
+};
+///////// View employees, department and roles functions /////////
 
 const viewEmp = () => {
   db.query("SELECT * FROM employee", function (err, results) {
