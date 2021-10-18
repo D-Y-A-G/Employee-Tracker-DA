@@ -18,9 +18,9 @@ const db = mysql.createConnection(
 const userChoices = {
   viewEmp: "View All employees",
   addEmp: "Add Employee",
-  updateEmp: "Update Employee Role",
+  updateEmpRole: "Update Employee Role",
   viewRoles: "View All Roles",
-  updateRole: "Add Role",
+  addRole: "Add New Role",
   viewDept: "View All Departments",
   addDept: "Add New Department",
   exitApp: "Exit Application",
@@ -53,6 +53,7 @@ const menuSelectPrompt = "Please select an action from below";
 //////////// Inquirer //////////////
 
 const startApp = () => {
+  console.log("WELCOME TO EMPLOYEE TRACKER");
   inquirer
     .prompt([
       {
@@ -73,16 +74,19 @@ const startApp = () => {
 
       switch (choice) {
         case userChoices.addEmp:
+          addEmp();
           break;
         case userChoices.viewEmp:
           viewEmp();
           break;
+        case userChoices.updateEmpRole:
+          break;
         case userChoices.viewRoles:
           viewRoles();
           break;
-        case userChoices.updateRole:
+        case userChoices.addRole:
+          addRole();
           break;
-
         case userChoices.viewDept:
           viewDept();
           break;
@@ -139,14 +143,14 @@ const addDept = () => {
     });
 };
 
-///////////////////adding
+///////////////////adding employee /////////////////////////
 
 const addEmp = () => {
   inquirer
     .prompt([
       {
         type: "input",
-        message: "Please add employee's name",
+        message: "Please type employee's first name",
         name: "name",
       },
       {
@@ -154,9 +158,27 @@ const addEmp = () => {
         message: "Please add employee's last name",
         name: "lastName",
       },
+      {
+        type: "list",
+        message: " What is the employees role?",
+        name: "empRole",
+        choices: ["Lawyer", "Salesperson", "Accountant", "Software Engineer"],
+      },
+      {
+        type: "list",
+        message: " Who is the employees Manager",
+        name: "empManager",
+        choices: ["John Doe", "Jimmy Johns", "Elisa Larrain", "Michael Myers"],
+      },
     ])
     .then((answer) => {
-      db.query(``, (err, results) => {});
+      db.query(
+        `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (" + ${answer.name} +", " + ${answer.lastName} +", " + ${answer.empRole} +", " + ${answer.empManager} +" )`,
+        (err, results) => {
+          if (err) throw err;
+          console.log("Employee added!");
+        }
+      );
       returnMainMenu();
     });
 };
@@ -164,24 +186,35 @@ const addEmp = () => {
 //////////////////////// Add Role ////////////////////////////////
 
 const addRole = () => {
-  inquirer.prompt([
-    {
-      type: "input",
-      message: " What is the name of the new Role?",
-      name: "roleName",
-    },
-    {
-      type: "input",
-      message: " What is the salary of the new Role?",
-      name: "salary",
-    },
-    {
-      type: "list",
-      message: " Which department does the role belong to?",
-      name: "roleDept",
-      choices: ["Engineering", "Sales", "Finance", "Legal", "Executive"],
-    },
-  ]);
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: " What is the name of the new Role?",
+        name: "roleName",
+      },
+      {
+        type: "input",
+        message: " What is the salary of the new Role?",
+        name: "salary",
+      },
+      {
+        type: "list",
+        message: " Which department does the role belong to?",
+        name: "roleDept",
+        choices: ["Engineering", "Sales", "Finance", "Legal", "Executive"],
+      },
+    ])
+    .then((answer) => {
+      db.query(
+        `INSERT INTO roles (title, salary, department_id) VALUES (" + ${answer.roleName} +", " + ${answer.salary} +", " + ${answer.roleDept} +" )`,
+        (err, results) => {
+          if (err) throw err;
+          console.log("Role added!");
+        }
+      );
+      returnMainMenu();
+    });
 };
 ///////// View employees, department and roles functions /////////
 
