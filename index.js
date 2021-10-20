@@ -7,7 +7,7 @@ const db = mysql.createConnection(
   {
     host: "localhost",
     user: "root",
-    password: "Denis1234",
+    password: "password",
     database: "employeeTracker_db",
   },
   console.log(`Connected to database.`)
@@ -17,14 +17,14 @@ const db = mysql.createConnection(
 
 const userChoices = {
   viewEmp: "View All employees",
-  addEmp: "Add Employee",
-  updateEmpRole: "Update Employee Role",
+  addEmp: "Add an Employee",
+  updateEmpRole: "Update an Employee Role",
   viewRoles: "View All Roles",
-  addRole: "Add New Role",
+  addRole: "Add a New Role",
   viewDept: "View All Departments",
-  addDept: "Add New Department",
-  exitApp: "Exit Application",
+  addDept: "Add a New Department",
   returnMainMenu: "Return to Main Menu",
+  exitApp: "Exit Application",
 };
 
 const menuSelectPrompt = "Please select an action from below";
@@ -50,10 +50,10 @@ const menuSelectPrompt = "Please select an action from below";
 // };
 // db.query("INSERT INTO employee SET ?", employee, (err, result) => {});
 
-//////////// Inquirer //////////////
+////////////////////////// Inquirer ///////////////////////////
+console.log("✍  ⏱  EMPLOYEE TRACKER ⏱ ✍");
 
 const startApp = () => {
-  console.log("WELCOME TO EMPLOYEE TRACKER");
   inquirer
     .prompt([
       {
@@ -73,11 +73,11 @@ const startApp = () => {
       const choice = answer.mainMenu;
 
       switch (choice) {
-        case userChoices.addEmp:
-          addEmp();
-          break;
         case userChoices.viewEmp:
           viewEmp();
+          break;
+        case userChoices.addEmp:
+          addEmp();
           break;
         case userChoices.updateEmpRole:
           break;
@@ -129,14 +129,19 @@ const addDept = () => {
         type: "input",
         message: "What is the department name?",
         name: "deptName",
+        validate: (deptName) => {
+          if (deptName) {
+            return true;
+          } else console.log("Please enter a Department name!");
+        },
       },
     ])
     .then((answer) => {
       db.query(
         `INSERT INTO department (department_name) VALUES ("${answer.deptName}")`,
-        (err, results) => {
+        (err, res) => {
           if (err) throw err;
-          console.log("Department added!");
+          console.log("\n New Department added!");
         }
       );
       returnMainMenu();
@@ -146,75 +151,92 @@ const addDept = () => {
 ///////////////////adding employee /////////////////////////
 
 const addEmp = () => {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        message: "Please type employee's first name",
-        name: "name",
-      },
-      {
-        type: "input",
-        message: "Please add employee's last name",
-        name: "lastName",
-      },
-      {
-        type: "list",
-        message: " What is the employees role?",
-        name: "empRole",
-        choices: ["Lawyer", "Salesperson", "Accountant", "Software Engineer"],
-      },
-      {
-        type: "list",
-        message: " Who is the employees Manager",
-        name: "empManager",
-        choices: ["John Doe", "Jimmy Johns", "Elisa Larrain", "Michael Myers"],
-      },
-    ])
-    .then((answer) => {
-      db.query(
-        `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (" + ${answer.name} +", " + ${answer.lastName} +", " + ${answer.empRole} +", " + ${answer.empManager} +" )`,
-        (err, results) => {
-          if (err) throw err;
-          console.log("Employee added!");
-        }
-      );
-      returnMainMenu();
-    });
+  db.query("SELECT * FROM employee", (err, results) => {
+    console.log(results);
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "Please type employee's first name",
+          name: "name",
+        },
+        {
+          type: "input",
+          message: "Please add employee's last name",
+          name: "lastName",
+        },
+        {
+          type: "list",
+          message: " What is the employees role?",
+          name: "empRole",
+          choices: ["Lawyer", "Salesperson", "Accountant", "Software Engineer"], // add map function here
+        },
+        {
+          type: "list",
+          message: " Who is the employees Manager",
+          name: "empManager",
+          choices: results.map((el) => {
+            return { name: el.first_name, value: el.id };
+          }),
+        },
+      ])
+      .then((answer) => {
+        db.query(
+          `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answer.name}", " ${answer.lastName}", "${answer.empRole}", "${answer.empManager}")`,
+          (err, results) => {
+            console.log(err, results);
+            if (err) throw err;
+            console.log("Employee added!");
+          }
+        );
+        returnMainMenu();
+      });
+  });
 };
 
 //////////////////////// Add Role ////////////////////////////////
 
 const addRole = () => {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        message: " What is the name of the new Role?",
-        name: "roleName",
-      },
-      {
-        type: "input",
-        message: " What is the salary of the new Role?",
-        name: "salary",
-      },
-      {
-        type: "list",
-        message: " Which department does the role belong to?",
-        name: "roleDept",
-        choices: ["Engineering", "Sales", "Finance", "Legal", "Executive"],
-      },
-    ])
-    .then((answer) => {
-      db.query(
-        `INSERT INTO roles (title, salary, department_id) VALUES (" + ${answer.roleName} +", " + ${answer.salary} +", " + ${answer.roleDept} +" )`,
-        (err, results) => {
-          if (err) throw err;
-          console.log("Role added!");
-        }
-      );
-      returnMainMenu();
-    });
+  db.query("SELECT * FROM department", (err, results) => {
+    console.log(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: " What is the name of the new Role?",
+          name: "roleName",
+        },
+        {
+          type: "input",
+          message: " What is the salary of the new Role?",
+          name: "salary",
+        },
+        {
+          type: "list",
+          message: " Which department does the role belong to?",
+          name: "roleDept",
+          choices: results.map((el) => {
+            return { name: el.department_name, value: el.id };
+          }),
+        },
+      ])
+      .then((answer) => {
+        // console.log(answer);
+        db.query(
+          `INSERT INTO roles (title, salary, department_id) VALUES ("${
+            answer.roleName
+          }", "${parseInt(answer.salary)}", " ${answer.roleDept}")`,
+          (err, results) => {
+            // console.log(err);
+            // console.log(typeof parseInt(answer.salary));
+            if (err) throw err;
+            console.log("Role added!");
+          }
+        );
+        returnMainMenu();
+      });
+  });
 };
 ///////// View employees, department and roles functions /////////
 
@@ -225,7 +247,7 @@ const viewEmp = () => {
     console.table(results);
   });
   returnMainMenu();
-  // console.clear();
+  console.clear();
 };
 
 const viewDept = () => {
@@ -233,7 +255,7 @@ const viewDept = () => {
     console.table(results);
   });
   returnMainMenu();
-  // console.clear();
+  console.clear();
 };
 
 const viewRoles = () => {
@@ -241,7 +263,7 @@ const viewRoles = () => {
     console.table(results);
   });
   returnMainMenu();
-  // console.clear();
+  console.clear();
 };
 
 startApp();
