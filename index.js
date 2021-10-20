@@ -29,6 +29,29 @@ const userChoices = {
 
 const menuSelectPrompt = "Please select an action from below";
 
+/////////// get all roles and employees ////////////
+
+// const allRoles = () => {
+//   const roles = [];
+//   db.query("SELECT * FROM roles", (err, result) => {
+//     if (err) throw err;
+//     result.forEach(({ title }) => roles.push(title));
+//   });
+//   return roles;
+// };
+
+// // const employees = () => {
+// //   const emps = [];
+// //   db.query(
+// //     'SELECT CONCAT_WS("", employee.name, employee.lastName) AS Employee FROM employee ORDER BY ASC',
+// //     (err, result) => {
+// //       if (err) throw err;
+// //       result.forEach(({ Employee }) => emps.push(Employee));
+// //     }
+// //   );
+// //   return emps;
+// // };
+
 /////////////// to get data from mysql /////////////
 // const dept = "Shipping";
 // db.query(
@@ -151,7 +174,7 @@ const addDept = () => {
 ///////////////////adding employee /////////////////////////
 
 const addEmp = () => {
-  db.query("SELECT * FROM employee", (err, results) => {
+  db.query("SELECT * FROM employee, roles", (err, results) => {
     console.log(results);
     inquirer
       .prompt([
@@ -169,14 +192,16 @@ const addEmp = () => {
           type: "list",
           message: " What is the employees role?",
           name: "empRole",
-          choices: ["Lawyer", "Salesperson", "Accountant", "Software Engineer"], // add map function here
+          choices: results.map((el) => {
+            return { name: el.title, value: el.id };
+          }),
         },
         {
           type: "list",
           message: " Who is the employees Manager",
           name: "empManager",
           choices: results.map((el) => {
-            return { name: el.first_name, value: el.id };
+            return { name: el.first_name + el.last_name, value: el.manager_id };
           }),
         },
       ])
@@ -193,6 +218,10 @@ const addEmp = () => {
       });
   });
 };
+
+/////////////////////// Update Role //////////////////////////////
+
+const updateEmpRole = () => {};
 
 //////////////////////// Add Role ////////////////////////////////
 
@@ -222,14 +251,11 @@ const addRole = () => {
         },
       ])
       .then((answer) => {
-        // console.log(answer);
         db.query(
           `INSERT INTO roles (title, salary, department_id) VALUES ("${
             answer.roleName
           }", "${parseInt(answer.salary)}", " ${answer.roleDept}")`,
           (err, results) => {
-            // console.log(err);
-            // console.log(typeof parseInt(answer.salary));
             if (err) throw err;
             console.log("Role added!");
           }
@@ -242,8 +268,6 @@ const addRole = () => {
 
 const viewEmp = () => {
   db.query("SELECT * FROM employee", function (err, results) {
-    //("+first_name", "+last_name+,")
-
     console.table(results);
   });
   returnMainMenu();
@@ -269,5 +293,3 @@ const viewRoles = () => {
 startApp();
 
 // const employee = {first_name: "Denis", last_name: "Arce", role_id: "1", manager_id: "1"};
-
-// db.query("INSERT INTO (first_name, last_name, role_id, manager_id) VALUES (" + employee.first_name + "," + employee.last_name + "," + employee.role_id + "," employee.manager_id + ")", function(err, results) {});
