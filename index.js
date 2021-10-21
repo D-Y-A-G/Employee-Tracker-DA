@@ -199,7 +199,7 @@ const updateEmpRole = () => {
           choices: results.map((el) => {
             return {
               name: el.title,
-              value: el.role_id + el.first_name,
+              value: el.role_id,
             };
           }),
         },
