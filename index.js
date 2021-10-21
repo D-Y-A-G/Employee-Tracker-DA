@@ -96,6 +96,7 @@ const returnMainMenu = () => {
           startApp();
           break;
         case userChoices.exitApp:
+          console.log("Goodbye, Have a GREAT day!");
           break;
       }
     });
@@ -132,18 +133,6 @@ const addDept = () => {
 
 const addEmp = () => {
   db.query("SELECT * FROM employee, roles", (err, results) => {
-    // db.query("SELECT title FROM roles", (err, results) => {
-
-    // const role = result.map((res) => {
-    //   return `${res.id} ${res.title}`;
-    // });
-    // db.query(
-    //   "SELECT id, first_name, last_name FROM employee",
-    //   (err, result) => {
-    //     const employeeNames = result.map((res) => {
-    //       return `${res.id} ${res.first_name} ${res.last_name}`;
-    //     });
-    // console.log(results);
     inquirer
       .prompt([
         {
@@ -170,8 +159,8 @@ const addEmp = () => {
           name: "empManager",
           choices: results.map((el) => {
             return {
-              name: el.first_name  +  el.last_name,
-               value: el.manager_id,
+              name: el.first_name + el.last_name,
+              value: el.manager_id,
             };
           }),
         },
@@ -187,7 +176,6 @@ const addEmp = () => {
         returnMainMenu();
       });
   });
-  // });
 };
 
 /////////////////////// Update Role //////////////////////////////
@@ -234,8 +222,6 @@ const updateEmpRole = () => {
 
 const addRole = () => {
   db.query("SELECT * FROM department", (err, results) => {
-    // console.log(results);
-
     inquirer
       .prompt([
         {
@@ -298,5 +284,3 @@ const viewRoles = () => {
 };
 
 startApp();
-
-// const employee = {first_name: "Denis", last_name: "Arce", role_id: "1", manager_id: "1"};
