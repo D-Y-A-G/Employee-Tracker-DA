@@ -2,6 +2,7 @@
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const mysql = require("mysql2");
+const figlet = require("figlet");
 
 const db = mysql.createConnection(
   {
@@ -30,7 +31,26 @@ const userChoices = {
 const menuSelectPrompt = "Please select an action from below";
 
 ////////////////////////// Inquirer ///////////////////////////
-console.log("✍  ⏱  EMPLOYEE TRACKER ⏱ ✍");
+// console.log("✍  ⏱  EMPLOYEE TRACKER ⏱ ✍");
+
+figlet.text(
+  "Employee Tracker!",
+  {
+    font: "Ghost",
+    horizontalLayout: "fitted",
+    verticalLayout: "fitted",
+    width: 100,
+    whitespaceBreak: true,
+  },
+  function (err, data) {
+    if (err) {
+      console.log("Something went wrong...");
+      console.dir(err);
+      return;
+    }
+    console.log(data);
+  }
+);
 
 const startApp = () => {
   inquirer
