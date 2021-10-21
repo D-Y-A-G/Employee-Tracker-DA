@@ -94,7 +94,7 @@ To contribute, do oull request and can assist in correcting any bugs or adding a
 
 ## **🚧Tests**
 
-![Vide Demo of Application](https://watch.screencastify.com/v/rEiVEv6P6J90DXv6pPbX)
+[Vide Demo of Application](https://watch.screencastify.com/v/rEiVEv6P6J90DXv6pPbX)
 
 Application Image:
 
